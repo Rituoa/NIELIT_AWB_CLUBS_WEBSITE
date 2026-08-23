@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import JoinClubButton from "../../../ui/JoinClubButton";
+import SignInButton from "../../../ui/SignInButton";
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -70,7 +71,7 @@ export default async function ClubPage({ params }) {
         
         {/* If not logged in at all, prompt them to sign in */}
         {!session && (
-          <p className="mt-6 text-zinc-500 italic">Sign in on the homepage to join this club.</p>
+          <SignInButton />
         )}
       </div>
 
