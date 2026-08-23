@@ -7,6 +7,7 @@ import { Pool } from 'pg';
 import JoinClubButton from "../../../ui/JoinClubButton";
 import SignInButton from "../../../ui/SignInButton";
 import PostAnnouncementForm from "../../../ui/PostAnnouncementForm";
+import CreateEventForm from "../../../ui/CreateEventForm";
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -24,9 +25,8 @@ export default async function ClubPage({ params }) {
     include: { 
       lead: true,
       members: true, 
-      announcements: {
-        orderBy: { createdAt: 'desc' }
-      }
+      announcements: { orderBy: { createdAt: 'desc' }},
+      events: { orderBy: { date: 'asc' } }
     }
   });
 
@@ -76,13 +76,30 @@ export default async function ClubPage({ params }) {
         )}
       </div>
 
-      {/* --- PUBLIC SECTION: Activities & Projects --- */}
+      {/* --- PUBLIC SECTION: Upcoming Events --- */}
       <div className="mb-12">
-        <h2 className="text-2xl font-semibold border-b border-zinc-800 pb-2 mb-4">Activities & Projects</h2>
-        <p className="text-zinc-400 leading-relaxed">
-          Public information about what this club builds, their events, and their goals goes here. 
-          Everyone on campus can see this section to decide if they want to join.
-        </p>
+        <h2 className="text-2xl font-semibold border-b border-zinc-800 pb-2 mb-6">Upcoming Events</h2>
+
+        {isLead && <CreateEventForm clubId={club.id} />}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {club.events.length === 0 ? (
+            <p className="text-zinc-500 col-span-2">No upcoming events scheduled.</p>
+          ) : (
+            club.events.map((event) => (
+              <div key={event.id} className="p-5 border border-zinc-800 rounded-xl bg-black">
+                <h3 className="font-semibold text-lg text-white">{event.title}</h3>
+                <p className="text-blue-400 text-sm mb-3">
+                  {new Date(event.date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                </p>
+                <p className="text-zinc-400 text-sm mb-3">{event.description}</p>
+                <div className="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-md bg-zinc-900 text-zinc-300 border border-zinc-800">
+                  📍 {event.location}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {/* --- PRIVATE SECTION: Only visible to Members and Leads --- */}

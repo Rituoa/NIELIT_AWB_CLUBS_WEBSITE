@@ -60,3 +60,36 @@ export async function postAnnouncement(clubId, formData) {
 
   revalidatePath(`/clubs/${clubId}`);
 }
+
+export async function createEvent(clubId, formData) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  const club = await prisma.club.findUnique({
+    where: { id: clubId },
+    include: { lead: true }
+  });
+
+  if (club.lead.email !== session.user.email) {
+    throw new Error("Only the Club Lead can create events.");
+  }
+
+  const title = formData.get("title");
+  const description = formData.get("description");
+  const location = formData.get("location");
+  
+  const date = new Date(formData.get("date")); 
+
+  // 4. Save to Database
+  await prisma.event.create({
+    data: {
+      title,
+      description,
+      location,
+      date,
+      clubId,
+    },
+  });
+
+  revalidatePath(`/clubs/${clubId}`);
+}
