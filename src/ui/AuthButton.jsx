@@ -1,13 +1,20 @@
 "use client";
 
-import { signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
-export default function AuthButton({ session }) {
-  // Safely check if session AND user exist
+export default function AuthButton() {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return (
+      <button disabled className="px-6 py-2 mt-8 rounded-full bg-zinc-800 text-zinc-500 font-medium">
+        Checking session...
+      </button>
+    );
+  }
+
   if (session?.user) {
-    // Fallback to "Student" if the Google account doesn't have a name
     const firstName = session.user.name ? session.user.name.split(" ")[0] : "Student";
-    
     return (
       <button 
         onClick={() => signOut()} 

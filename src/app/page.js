@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import { getServerSession } from "next-auth/next";
 import AuthButton from '../ui/AuthButton';
-import { authOptions } from "../lib/auth";
+
+
 
 // Initialize Prisma with the Postgres Adapter
 const connectionString = process.env.DATABASE_URL;
@@ -25,8 +25,6 @@ const colorClasses = [
 ];
 
 export default async function Home() {
-  // Check if the user is authenticated on the server
-  const session = await getServerSession(authOptions);
 
   const activeClubs = await prisma.club.findMany({
     include: { lead: true }
@@ -49,7 +47,7 @@ export default async function Home() {
         <p className="text-zinc-400 text-center text-lg md:text-xl font-medium mt-[-40px]">
           Powered by students. Built for the campus.
         </p>
-        <AuthButton session="{session}"/>
+        <AuthButton />
       </div>
 
       {/* Club Directory Section */}

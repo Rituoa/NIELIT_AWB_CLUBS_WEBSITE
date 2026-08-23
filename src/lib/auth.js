@@ -10,12 +10,11 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   adapter: PrismaAdapter(prisma),
-
   session: {
     strategy: "jwt",
   },
-  
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
