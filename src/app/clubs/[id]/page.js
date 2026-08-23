@@ -6,6 +6,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import JoinClubButton from "../../../ui/JoinClubButton";
 import SignInButton from "../../../ui/SignInButton";
+import PostAnnouncementForm from "../../../ui/PostAnnouncementForm";
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -90,6 +91,7 @@ export default async function ClubPage({ params }) {
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             🔒 Member Announcements
           </h2>
+          {isLead && <PostAnnouncementForm clubId={club.id} />}
           {club.announcements.length === 0 ? (
             <p className="text-zinc-500">No announcements yet.</p>
           ) : (

@@ -31,3 +31,32 @@ export async function joinClub(clubId) {
 
   revalidatePath(`/clubs/${clubId}`);
 }
+
+export async function postAnnouncement(clubId, formData) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const club = await prisma.club.findUnique({
+    where: { id: clubId },
+    include: { lead: true }
+  });
+
+  if (club.lead.email !== session.user.email) {
+    throw new Error("Security Error: Only the Club Lead can post announcements.");
+  }
+
+  const title = formData.get("title");
+  const content = formData.get("content");
+
+  await prisma.announcement.create({
+    data: {
+      title,
+      content,
+      clubId,
+    },
+  });
+
+  revalidatePath(`/clubs/${clubId}`);
+}
