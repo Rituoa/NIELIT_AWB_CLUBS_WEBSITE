@@ -16,12 +16,20 @@ export default function AuthButton() {
   if (session?.user) {
     const firstName = session.user.name ? session.user.name.split(" ")[0] : "Student";
     return (
-      <button 
-        onClick={() => signOut()} 
-        className="px-6 py-2 mt-8 rounded-full bg-zinc-800 text-white font-medium hover:bg-zinc-700 transition-colors border border-zinc-700"
-      >
-        Sign Out ({firstName})
-      </button>
+      <div className="flex flex-col sm:flex-row gap-4 mt-8">
+        <Link 
+          href="/profile"
+          className="px-6 py-2 rounded-full bg-white text-black font-medium hover:bg-zinc-200 transition-colors text-center"
+        >
+          My Profile Dashboard
+        </Link>
+        <button 
+          onClick={() => signOut()} 
+          className="px-6 py-2 mt-8 rounded-full bg-zinc-800 text-white font-medium hover:bg-zinc-700 transition-colors border border-zinc-700"
+        >
+          Sign Out ({firstName})
+        </button>
+      </div>
     );
   }
 
