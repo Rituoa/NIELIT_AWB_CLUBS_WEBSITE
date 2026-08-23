@@ -10,8 +10,6 @@ datasource db {
 // Database Tables
 // ---------------------------
 
-// ... keep your generator, datasource, and enums at the top ...
-
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -20,10 +18,10 @@ model User {
   image         String?
   role          Role      @default(STUDENT)
   createdAt     DateTime  @default(now())
-
   accounts      Account[]
   sessions      Session[]
   clubsLed      Club[]    @relation("ClubLead")
+  clubsJoined   Club[]    @relation("ClubMembers")
 }
 
 model Account {
@@ -39,7 +37,6 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@unique([provider, providerAccountId])
 }
@@ -57,12 +54,11 @@ model Club {
   name        String   @unique
   description String
   tags        String[]
-  
-  // This must match the User id type!
   leadId      String   @db.Uuid
   lead        User     @relation("ClubLead", fields: [leadId], references: [id])
-  
+  members     User[]   @relation("ClubMembers")
   events      Event[]
+  announcements Announcement[]
 }
 
 model Event {
@@ -70,8 +66,15 @@ model Event {
   title       String
   date        DateTime
   location    String
-  
-  // This must match the Club id type!
+  clubId      String   @db.Uuid
+  club        Club     @relation(fields: [clubId], references: [id])
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
   clubId      String   @db.Uuid
   club        Club     @relation(fields: [clubId], references: [id])
 }
