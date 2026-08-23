@@ -11,6 +11,11 @@ const prisma = new PrismaClient({ adapter });
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
+
+  session: {
+    strategy: "jwt",
+  },
+  
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
