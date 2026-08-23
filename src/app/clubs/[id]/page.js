@@ -12,7 +12,8 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 export default async function ClubPage({ params }) {
-  const clubId = params.id; 
+  const resolvedParams = await params;
+  const clubId = resolvedParams.id;
 
   const session = await getServerSession(authOptions);
 
