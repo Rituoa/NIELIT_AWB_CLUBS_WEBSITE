@@ -9,6 +9,7 @@ import SignInButton from "../../../ui/SignInButton";
 import PostAnnouncementForm from "../../../ui/PostAnnouncementForm";
 import CreateEventForm from "../../../ui/CreateEventForm";
 import CreateProjectForm from "../../../ui/CreateProjectForm";
+import AddResourceForm from "../../../ui/AddResourceForm";
 
 
 const connectionString = process.env.DATABASE_URL;
@@ -31,7 +32,8 @@ export default async function ClubPage({ params }) {
       members: true,
       announcements: { orderBy: { createdAt: 'desc' }},
       events: { orderBy: { date: 'asc' } },
-      projects: { orderBy: { createdAt: 'desc' } }
+      projects: { orderBy: { createdAt: 'desc' } },
+      resources: { orderBy: { createdAt: 'desc' } }
     }
   });
 
@@ -151,6 +153,46 @@ export default async function ClubPage({ params }) {
                   </a>
                 )}
               </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* --- PUBLIC SECTION: Resource & Study Vault --- */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-semibold border-b border-zinc-800 pb-2 mb-6 text-white flex items-center gap-2">
+          📚 Study Vault
+        </h2>
+        
+        {/* Only the Executive Board sees the upload form */}
+        {isLeadership && <AddResourceForm clubId={club.id} />}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {club.resources.length === 0 ? (
+            <div className="col-span-full p-8 border border-zinc-800 border-dashed rounded-xl bg-black/50 text-center text-zinc-500">
+              No resources have been added to the vault yet.
+            </div>
+          ) : (
+            club.resources.map((resource) => (
+              <a 
+                key={resource.id}
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer" 
+                className="flex items-center gap-4 p-4 border border-zinc-800 rounded-xl bg-black hover:border-zinc-500 transition-colors group"
+              >
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-zinc-900 text-zinc-400 group-hover:text-blue-400 group-hover:bg-blue-400/10 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <h3 className="font-semibold text-white text-sm truncate">{resource.title}</h3>
+                  {resource.type && (
+                    <p className="text-zinc-500 text-xs mt-0.5">{resource.type}</p>
+                  )}
+                </div>
+              </a>
             ))
           )}
         </div>

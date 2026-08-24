@@ -151,3 +151,32 @@ export async function createProject(clubId, formData) {
 
   revalidatePath(`/clubs/${clubId}`);
 }
+
+export async function addResource(clubId, formData) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  const club = await prisma.club.findUnique({
+    where: { id: clubId },
+    include: { president: true, vicePresident: true, technicalHead: true }
+  });
+
+  const userEmail = session.user.email;
+  const isLeadership = 
+    club.president?.email === userEmail || 
+    club.vicePresident?.email === userEmail || 
+    club.technicalHead?.email === userEmail;
+
+  if (!isLeadership) throw new Error("Only leadership can add resources.");
+
+  await prisma.resource.create({
+    data: {
+      title: formData.get("title"),
+      url: formData.get("url"),
+      type: formData.get("type"),
+      clubId,
+    },
+  });
+
+  revalidatePath(`/clubs/${clubId}`);
+}

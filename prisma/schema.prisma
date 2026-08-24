@@ -66,6 +66,7 @@ model Club {
   events      Event[]
   announcements Announcement[]
   projects Project[]
+  resources Resource[]
 }
 
 model Event {
@@ -95,6 +96,17 @@ model Project {
   link        String?  // Optional field for GitHub or demo links
   createdAt   DateTime @default(now())
   
+  clubId      String   @db.Uuid
+  club        Club     @relation(fields: [clubId], references: [id])
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  url         String   // Link to a Google Drive PDF, Notion page, or website
+  type        String?  // e.g., 'PDF', 'Note', 'Video'
+  createdAt   DateTime @default(now())
+
   clubId      String   @db.Uuid
   club        Club     @relation(fields: [clubId], references: [id])
 }
