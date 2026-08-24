@@ -65,6 +65,7 @@ model Club {
   members     User[]   @relation("ClubMembers")
   events      Event[]
   announcements Announcement[]
+  projects Project[]
 }
 
 model Event {
@@ -83,6 +84,17 @@ model Announcement {
   title       String
   content     String
   createdAt   DateTime @default(now())
+  clubId      String   @db.Uuid
+  club        Club     @relation(fields: [clubId], references: [id])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  link        String?  // Optional field for GitHub or demo links
+  createdAt   DateTime @default(now())
+  
   clubId      String   @db.Uuid
   club        Club     @relation(fields: [clubId], references: [id])
 }
