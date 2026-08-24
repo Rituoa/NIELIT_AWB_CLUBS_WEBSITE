@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import LeaveClubButton from "../../ui/LeaveClubButton";
 
 // --- Database Setup ---
 const connectionString = process.env.DATABASE_URL;
@@ -85,7 +86,10 @@ export default async function ProfilePage() {
             {user.clubsJoined.map(club => (
               <Link href={`/clubs/${club.id}`} key={club.id} className="block p-5 border border-zinc-800 rounded-xl bg-black hover:border-zinc-500 transition-colors">
                 <h3 className="font-bold text-lg text-white">{club.name}</h3>
-                <span className="text-xs text-zinc-400 mt-3 block">View Announcements &rarr;</span>
+                <div className="flex justify-between items-center mt-4">
+                  <span className="text-xs text-zinc-400">View Announcements &rarr;</span>
+                  <LeaveClubButton clubId={club.id} />
+                </div>
               </Link>
             ))}
           </div>

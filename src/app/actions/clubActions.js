@@ -80,7 +80,6 @@ export async function createEvent(clubId, formData) {
   
   const date = new Date(formData.get("date")); 
 
-  // 4. Save to Database
   await prisma.event.create({
     data: {
       title,
@@ -91,5 +90,24 @@ export async function createEvent(clubId, formData) {
     },
   });
 
+  revalidatePath(`/clubs/${clubId}`);
+}
+
+export async function leaveClub(clubId) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.user.update({
+    where: { email: session.user.email },
+    data: {
+      clubsJoined: {
+        disconnect: { id: clubId },
+      },
+    },
+  });
+
+  revalidatePath('/profile');
   revalidatePath(`/clubs/${clubId}`);
 }
