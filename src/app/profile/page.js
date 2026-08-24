@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import LeaveClubButton from "../../ui/LeaveClubButton";
+import LeaveClubButton from "../../ui/LeaveClubButton"; 
 
 // --- Database Setup ---
 const connectionString = process.env.DATABASE_URL;
@@ -14,20 +14,31 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 export default async function ProfilePage() {
-  // 1. Get session. If not logged in, kick them back to the homepage.
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     redirect("/");
   }
 
-  // 2. Fetch the user and include BOTH the clubs they joined and the ones they lead
+  // 1. Fetch the user and include ALL the new leadership arrays
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: {
       clubsJoined: true,
-      clubsLed: true,
+      clubsPresided: true,
+      clubsVicePresided: true,
+      clubsTechHeaded: true,
     }
   });
+
+  // 2. Combine all leadership roles into one flat array 
+  const allManagedClubs = [
+    ...user.clubsPresided,
+    ...user.clubsVicePresided,
+    ...user.clubsTechHeaded
+  ];
+  
+  // 3. Remove duplicates (in case someone is marked as President AND Tech Head of the same club)
+  const uniqueManagedClubs = Array.from(new Map(allManagedClubs.map(club => [club.id, club])).values());
 
   return (
     <main className="min-h-screen bg-black text-white p-10 max-w-4xl mx-auto">
@@ -51,14 +62,14 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      {/* --- Clubs You Lead --- */}
-      {user.clubsLed.length > 0 && (
+      {/* --- Clubs You Manage (Executive Board) --- */}
+      {uniqueManagedClubs.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-semibold border-b border-zinc-800 pb-2 mb-6 text-blue-400">
-            👑 Clubs You Lead
+            👑 Clubs You Manage
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {user.clubsLed.map(club => (
+            {uniqueManagedClubs.map(club => (
               <Link href={`/clubs/${club.id}`} key={club.id} className="block p-5 border border-zinc-800 rounded-xl bg-black hover:border-zinc-500 transition-colors">
                 <h3 className="font-bold text-lg text-white">{club.name}</h3>
                 <p className="text-zinc-400 text-sm mt-1 line-clamp-2">{club.description}</p>
