@@ -8,6 +8,8 @@ import JoinClubButton from "../../../ui/JoinClubButton";
 import SignInButton from "../../../ui/SignInButton";
 import PostAnnouncementForm from "../../../ui/PostAnnouncementForm";
 import CreateEventForm from "../../../ui/CreateEventForm";
+import CreateProjectForm from "../../../ui/CreateProjectForm";
+
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -28,7 +30,8 @@ export default async function ClubPage({ params }) {
       technicalHead: true,
       members: true,
       announcements: { orderBy: { createdAt: 'desc' }},
-      events: { orderBy: { date: 'asc' } }
+      events: { orderBy: { date: 'asc' } },
+      projects: { orderBy: { createdAt: 'desc' } }
     }
   });
 
@@ -111,6 +114,42 @@ export default async function ClubPage({ params }) {
                 <div className="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-md bg-zinc-900 text-zinc-300 border border-zinc-800">
                   📍 {event.location}
                 </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* --- PUBLIC SECTION: Project Showcase --- */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-semibold border-b border-zinc-800 pb-2 mb-6 text-white flex items-center gap-2">
+          🚀 Active Projects
+        </h2>
+        
+        {/* Only the Executive Board sees the creation form */}
+        {isLeadership && <CreateProjectForm clubId={club.id} />}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {club.projects.length === 0 ? (
+            <div className="col-span-2 p-8 border border-zinc-800 border-dashed rounded-xl bg-black/50 text-center text-zinc-500">
+              No projects showcased yet.
+            </div>
+          ) : (
+            club.projects.map((project) => (
+              <div key={project.id} className="p-6 border border-zinc-800 rounded-xl bg-black hover:border-zinc-600 transition-colors flex flex-col h-full">
+                <h3 className="font-semibold text-lg text-white mb-2">{project.title}</h3>
+                <p className="text-zinc-400 text-sm mb-6 flex-grow">{project.description}</p>
+                
+                {project.link && (
+                  <a 
+                    href={project.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex w-max items-center text-xs font-semibold px-3 py-1.5 rounded-md bg-zinc-900 text-blue-400 border border-zinc-800 hover:bg-zinc-800 transition-colors"
+                  >
+                    View Repository/Demo &rarr;
+                  </a>
+                )}
               </div>
             ))
           )}
