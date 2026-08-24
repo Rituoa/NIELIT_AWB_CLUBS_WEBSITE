@@ -7,7 +7,6 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import AuthButton from '../ui/AuthButton';
 
-//One with high knowledge
 
 // Initialize Prisma with the Postgres Adapter
 const connectionString = process.env.DATABASE_URL;
