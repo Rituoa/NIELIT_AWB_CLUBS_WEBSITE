@@ -27,7 +27,7 @@ const colorClasses = [
 export default async function Home() {
 
   const activeClubs = await prisma.club.findMany({
-    include: { lead: true }
+    include: { president: true }
   });
 
   return (
@@ -77,7 +77,7 @@ export default async function Home() {
                     </h3>
                     {/* This is the new line displaying the lead's name */}
                     <span className="text-xs text-zinc-500 mt-1">
-                      Led by {club.lead?.name || "Student"}
+                      Led by {club.president?.name || "Student"}
                     </span>
                   </div>
 
