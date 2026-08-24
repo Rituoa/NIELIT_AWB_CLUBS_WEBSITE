@@ -23,8 +23,10 @@ export default async function ClubPage({ params }) {
   const club = await prisma.club.findUnique({
     where: { id: clubId },
     include: { 
-      lead: true,
-      members: true, 
+      president: true,
+      vicePresident: true,
+      technicalHead: true,
+      members: true,
       announcements: { orderBy: { createdAt: 'desc' }},
       events: { orderBy: { date: 'asc' } }
     }
@@ -44,8 +46,11 @@ export default async function ClubPage({ params }) {
 
   const userEmail = session?.user?.email;
   const isMember = club.members.some(member => member.email === userEmail);
-  const isLead = club.lead?.email === userEmail;
-  const hasAccessToAnnouncements = isMember || isLead;
+  const isLeadership = 
+    club.president?.email === userEmail ||
+    club.vicePresident?.email === userEmail ||
+    club.technicalHead?.email === userEmail;
+  const hasAccessToAnnouncements = isMember || isLeadership;
 
   return (
     <main className="min-h-screen bg-black text-white p-10 max-w-4xl mx-auto">
@@ -60,13 +65,23 @@ export default async function ClubPage({ params }) {
         <p className="text-xl text-zinc-400 mb-8">{club.description}</p>
         
         <div className="p-6 border border-zinc-800 rounded-xl bg-zinc-900/50 max-w-md mb-8">
-          <h3 className="text-lg font-semibold mb-2">Club Details</h3>
-          <p className="text-zinc-400"><strong>Student Lead:</strong> {club.lead?.name || "TBA"}</p>
-          <p className="text-zinc-400"><strong>Total Members:</strong> {club.members.length}</p>
+          <h3 className="text-lg font-semibold mb-4 border-b border-zinc-800 pb-2">Executive Board</h3>
+          <div className="space-y-2 mb-4">
+            <p className="text-zinc-300"><span className="text-zinc-500 w-32 inline-block">President:</span> {club.president?.name || "TBA"}</p>
+            
+            {club.vicePresident && (
+              <p className="text-zinc-300"><span className="text-zinc-500 w-32 inline-block">Vice President:</span> {club.vicePresident.name}</p>
+            )}
+            
+            {club.technicalHead && (
+              <p className="text-zinc-300"><span className="text-zinc-500 w-32 inline-block">Technical Head:</span> {club.technicalHead.name}</p>
+            )}
+          </div>
+          <p className="text-zinc-400 text-sm border-t border-zinc-800 pt-3"><strong>Total Members:</strong> {club.members.length}</p>
         </div>
         
         {/* If logged in but NOT a member/lead, show the Join button */}
-        {session && !isMember && !isLead && (
+        {session && !isMember && !isLeadership && (
           <JoinClubButton clubId={club.id} />
         )}
         
@@ -80,7 +95,7 @@ export default async function ClubPage({ params }) {
       <div className="mb-12">
         <h2 className="text-2xl font-semibold border-b border-zinc-800 pb-2 mb-6">Upcoming Events</h2>
 
-        {isLead && <CreateEventForm clubId={club.id} />}
+        {isLeadership && <CreateEventForm clubId={club.id} />}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {club.events.length === 0 ? (
@@ -108,7 +123,7 @@ export default async function ClubPage({ params }) {
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             🔒 Member Announcements
           </h2>
-          {isLead && <PostAnnouncementForm clubId={club.id} />}
+          {isLeadership && <PostAnnouncementForm clubId={club.id} />}
           {club.announcements.length === 0 ? (
             <p className="text-zinc-500">No announcements yet.</p>
           ) : (

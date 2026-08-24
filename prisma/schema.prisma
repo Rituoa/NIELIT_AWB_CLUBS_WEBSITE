@@ -20,8 +20,10 @@ model User {
   createdAt     DateTime  @default(now())
   accounts      Account[]
   sessions      Session[]
-  clubsLed      Club[]    @relation("ClubLead")
-  clubsJoined   Club[]    @relation("ClubMembers")
+  clubsJoined       Club[] @relation("ClubMembers")
+  clubsPresided     Club[] @relation("ClubPresident")
+  clubsVicePresided Club[] @relation("ClubVicePresident")
+  clubsTechHeaded   Club[] @relation("ClubTechHead")
 }
 
 model Account {
@@ -54,8 +56,12 @@ model Club {
   name        String   @unique
   description String
   tags        String[]
-  leadId      String   @db.Uuid
-  lead        User     @relation("ClubLead", fields: [leadId], references: [id])
+  presidentId     String   @db.Uuid
+  president       User     @relation("ClubPresident", fields: [presidentId], references: [id])
+  vicePresidentId String?  @db.Uuid
+  vicePresident   User?    @relation("ClubVicePresident", fields: [vicePresidentId], references: [id])
+  technicalHeadId String?  @db.Uuid
+  technicalHead   User?    @relation("ClubTechHead", fields: [technicalHeadId], references: [id])
   members     User[]   @relation("ClubMembers")
   events      Event[]
   announcements Announcement[]

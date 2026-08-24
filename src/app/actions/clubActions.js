@@ -33,18 +33,23 @@ export async function joinClub(clubId) {
 }
 
 export async function postAnnouncement(clubId, formData) {
+
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    throw new Error("Unauthorized");
-  }
+  if (!session?.user?.email) throw new Error("Unauthorized");
 
   const club = await prisma.club.findUnique({
     where: { id: clubId },
-    include: { lead: true }
+    include: { president: true, vicePresident: true, technicalHead: true }
   });
+  
+  const userEmail = session.user.email;
+  const isLeadership = 
+    club.president?.email === userEmail || 
+    club.vicePresident?.email === userEmail || 
+    club.technicalHead?.email === userEmail;
 
-  if (club.lead.email !== session.user.email) {
-    throw new Error("Security Error: Only the Club Lead can post announcements.");
+  if (!isLeadership) {
+    throw new Error("Security Error: Only the Executive Board can post announcements.");
   }
 
   const title = formData.get("title");
@@ -62,22 +67,28 @@ export async function postAnnouncement(clubId, formData) {
 }
 
 export async function createEvent(clubId, formData) {
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) throw new Error("Unauthorized");
 
   const club = await prisma.club.findUnique({
     where: { id: clubId },
-    include: { lead: true }
+    include: { president: true, vicePresident: true, technicalHead: true }
   });
 
-  if (club.lead.email !== session.user.email) {
-    throw new Error("Only the Club Lead can create events.");
+  const userEmail = session.user.email;
+  const isLeadership = 
+    club.president?.email === userEmail || 
+    club.vicePresident?.email === userEmail || 
+    club.technicalHead?.email === userEmail;
+
+  if (!isLeadership) {
+    throw new Error("Security Error: Only the Executive Board can create events.");
   }
 
   const title = formData.get("title");
   const description = formData.get("description");
   const location = formData.get("location");
-  
   const date = new Date(formData.get("date")); 
 
   await prisma.event.create({
