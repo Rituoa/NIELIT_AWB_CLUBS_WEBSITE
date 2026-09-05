@@ -7,6 +7,8 @@ import Link from "next/link";
 import JoinClubButton from "../../../ui/JoinClubButton";
 import CreateProjectForm from "../../../ui/CreateProjectForm";
 import AddResourceForm from "../../../ui/AddResourceForm";
+import CreateAnnouncementForm from "../../../ui/CreateAnnouncementForm";
+import CreateEventForm from "../../../ui/CreateEventForm";
 
 // Initialize Database
 const connectionString = process.env.DATABASE_URL;
@@ -162,6 +164,87 @@ export default async function ClubPage({ params }) {
                     {resource.type && <p className="text-zinc-500 text-xs mt-1 uppercase tracking-wider">{resource.type}</p>}
                   </div>
                 </a>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* --- 4. ANNOUNCEMENTS --- */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="text-xl">📢</span> Announcements
+          </h2>
+          
+          {isLeadership && <CreateAnnouncementForm clubId={club.id} />}
+
+          <div className="space-y-4 mt-6">
+            {club.announcements.length === 0 ? (
+              <div className="p-8 border border-zinc-800 border-dashed rounded-2xl bg-zinc-900/20 backdrop-blur-sm text-center text-zinc-500">
+                No announcements yet.
+              </div>
+            ) : (
+              club.announcements.map((ann) => (
+                <div key={ann.id} className="p-6 border border-zinc-800 rounded-2xl bg-zinc-900/40 backdrop-blur-sm shadow-lg">
+                  <h3 className="font-bold text-lg text-white mb-2">{ann.title}</h3>
+                  <p className="text-zinc-300 whitespace-pre-wrap">{ann.content}</p>
+                  <p className="text-xs text-zinc-500 mt-4 font-medium uppercase tracking-wider">
+                    {new Date(ann.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* --- 5. UPCOMING EVENTS --- */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="text-xl">🗓️</span> Upcoming Events
+          </h2>
+          
+          {isLeadership && <CreateEventForm clubId={club.id} />}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            {club.events.length === 0 ? (
+              <div className="col-span-2 p-8 border border-zinc-800 border-dashed rounded-2xl bg-zinc-900/20 backdrop-blur-sm text-center text-zinc-500">
+                No upcoming events scheduled.
+              </div>
+            ) : (
+              club.events.map((event) => (
+                <div key={event.id} className="p-6 border border-zinc-800 rounded-2xl bg-zinc-900/40 backdrop-blur-sm shadow-lg flex flex-col">
+                  <h3 className="font-bold text-lg text-white mb-2">{event.name}</h3>
+                  <p className="text-zinc-400 text-sm mb-4 flex-grow">{event.description}</p>
+                  <div className="flex items-center justify-between text-xs font-semibold px-4 py-2 bg-purple-500/10 text-purple-300 border border-purple-500/20 rounded-lg">
+                    <span>{new Date(event.date).toLocaleDateString()}</span>
+                    <span>{event.location}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* --- 6. CLUB MEMBERS --- */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="text-xl">👥</span> Members ({club.members.length})
+          </h2>
+          
+          <div className="flex flex-wrap gap-3">
+            {club.members.length === 0 ? (
+              <p className="text-zinc-500 italic">No members have joined yet.</p>
+            ) : (
+              club.members.map((member) => (
+                <div key={member.id} className="flex items-center gap-3 px-4 py-2 bg-zinc-900/40 backdrop-blur-sm border border-zinc-800 rounded-full shadow-md">
+                  {member.image ? (
+                    <img src={member.image} alt={member.name} className="w-6 h-6 rounded-full" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">
+                      {member.name?.charAt(0)}
+                    </div>
+                  )}
+                  <span className="text-sm font-medium text-zinc-300">{member.name}</span>
+                </div>
               ))
             )}
           </div>
