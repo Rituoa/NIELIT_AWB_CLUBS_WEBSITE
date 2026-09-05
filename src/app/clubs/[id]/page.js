@@ -15,12 +15,16 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 export default async function ClubPage({ params }) {
+  // 1. Await the params first!
+  const resolvedParams = await params;
+  const clubId = resolvedParams.id;
+  
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
 
-  // Fetch the club and all its related data
+  // 2. Pass the resolved clubId into your Prisma query
   const club = await prisma.club.findUnique({
-    where: { id: params.id },
+    where: { id: clubId },
     include: {
       president: true,
       vicePresident: true,
@@ -32,7 +36,6 @@ export default async function ClubPage({ params }) {
       resources: { orderBy: { createdAt: 'desc' } }
     }
   });
-
   if (!club) {
     return (
       <main className="min-h-screen bg-[#09090b] flex items-center justify-center text-white">
