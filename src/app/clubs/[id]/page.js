@@ -7,7 +7,7 @@ import Link from "next/link";
 import JoinClubButton from "../../../ui/JoinClubButton";
 import CreateProjectForm from "../../../ui/CreateProjectForm";
 import AddResourceForm from "../../../ui/AddResourceForm";
-import CreateAnnouncementForm from "../../../ui/CreateAnnouncementForm";
+import PostAnnouncementForm from "../../../ui/PostAnnouncementForm";
 import CreateEventForm from "../../../ui/CreateEventForm";
 
 // Initialize Database
@@ -175,7 +175,7 @@ export default async function ClubPage({ params }) {
             <span className="text-xl">📢</span> Announcements
           </h2>
           
-          {isLeadership && <CreateAnnouncementForm clubId={club.id} />}
+          {isLeadership && <PostAnnouncementForm clubId={club.id} />}
 
           <div className="space-y-4 mt-6">
             {club.announcements.length === 0 ? (
