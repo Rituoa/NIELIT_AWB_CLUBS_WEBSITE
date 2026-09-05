@@ -407,7 +407,6 @@ const WarpText = ({
     };
 
     const onPointerMove = event => {
-      if (event.pointerType === 'touch') return;
       const rect = canvas.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
       pointer.tx = (event.clientX - rect.left) / rect.width;
@@ -482,7 +481,10 @@ const WarpText = ({
     intersectionObserver.observe(container);
 
     canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerdown', onPointerMove);
     canvas.addEventListener('pointerleave', onPointerLeave);
+    canvas.addEventListener('pointerup', onPointerLeave);
+    canvas.addEventListener('pointercancel', onPointerLeave);
     canvas.addEventListener('webglcontextlost', onContextLost, false);
     document.addEventListener('visibilitychange', onVisibility);
     mediaQuery?.addEventListener('change', onReducedMotion);
@@ -499,7 +501,10 @@ const WarpText = ({
       resizeObserver?.disconnect();
       intersectionObserver?.disconnect();
       canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerdown', onPointerMove);
       canvas.removeEventListener('pointerleave', onPointerLeave);
+      canvas.removeEventListener('pointerup', onPointerLeave);
+      canvas.removeEventListener('pointercancel', onPointerLeave);
       canvas.removeEventListener('webglcontextlost', onContextLost);
       document.removeEventListener('visibilitychange', onVisibility);
       mediaQuery?.removeEventListener('change', onReducedMotion);
